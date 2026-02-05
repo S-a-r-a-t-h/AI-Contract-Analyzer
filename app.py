@@ -1,33 +1,35 @@
 import streamlit as st
 import requests
 
-API_KEY = "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"
+# 🔴 PUT YOUR NEW OPENROUTER KEY HERE (create new one)
+API_KEY = "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"
 
-st.title("AI Contract Risk Analyzer for SMEs")
+st.title("AI Contract Risk Analyzer")
 
-uploaded_file = st.file_uploader("Upload contract", type=["txt"])
+uploaded_file = st.file_uploader("Upload contract file", type=["txt"])
 
 if uploaded_file is not None:
     contract_text = uploaded_file.read().decode("utf-8")
     st.success("File uploaded successfully")
 
     if st.button("Analyze Contract"):
+        with st.spinner("Analyzing..."):
 
-        url = "https://openrouter.ai/api/v1/chat/completions"
+            url = "https://openrouter.ai/api/v1/chat/completions"
 
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "HTTP-Referer": "https://localhost",
-            "X-Title": "AI Contract Analyzer",
-            "Content-Type": "application/json"
-        }
+            headers = {
+                "Authorization": f"Bearer {API_KEY}",
+                "HTTP-Referer": "http://localhost",
+                "X-Title": "AI Contract Analyzer",
+                "Content-Type": "application/json"
+            }
 
-        data = {
-            "model": "mistralai/mixtral-8x7b-instruct",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": f"""
+            data = {
+                "model": "mistralai/mistral-7b-instruct",  # ⭐ stable free model
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": f"""
 Analyze this contract and give:
 1. Summary
 2. Risk level
@@ -37,19 +39,47 @@ Analyze this contract and give:
 Contract:
 {contract_text[:3000]}
 """
-                }
-            ]
-        }
+                    }
+                ]
+            }
 
-        response = requests.post(url, headers=headers, json=data)
-        result = response.json()
+            response = requests.post(url, headers=headers, json=data)
+            result = response.json()
 
-        # SAFE CHECK
-        if "choices" in result:
-            output = result["choices"][0]["message"]["content"]
-            st.subheader("AI Analysis Result")
-            st.write(output)
-        else:
-            st.error("API error or free model limit reached")
-            st.write(result)
+            # SAFE OUTPUT
+            if "choices" in result:
+                output = result["choices"][0]["message"]["content"]
+                st.subheader("AI Analysis Result")
+                st.write(output)
+            else:
+                st.error("API limit reached or key invalid")
+                st.write(result)
 
+# chat feature
+st.subheader("Chat with contract")
+user_q = st.text_input("Ask anything about contract")
+
+if user_q:
+    url = "https://openrouter.ai/api/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "HTTP-Referer": "http://localhost",
+        "X-Title": "AI Contract Analyzer",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistralai/mistral-7b-instruct",
+        "messages": [
+            {"role": "user", "content": user_q}
+        ]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    result = response.json()
+
+    if "choices" in result:
+        st.write(result["choices"][0]["message"]["content"])
+    else:
+        st.error("Try again (free model busy)")
