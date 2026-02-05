@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_KEY = "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"
+API_KEY = "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"
 
 st.title("AI Contract Risk Analyzer for SMEs")
 
@@ -52,3 +52,4 @@ Contract:
         else:
             st.error("API error or free model limit reached")
             st.write(result)
+
