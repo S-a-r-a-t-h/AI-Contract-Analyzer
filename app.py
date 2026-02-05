@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # 🔴 PUT YOUR NEW OPENROUTER KEY HERE (create new one)
-API_KEY = "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"
+API_KEY = "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"
 
 st.title("AI Contract Risk Analyzer")
 
@@ -83,3 +83,4 @@ if user_q:
         st.write(result["choices"][0]["message"]["content"])
     else:
         st.error("Try again (free model busy)")
+
